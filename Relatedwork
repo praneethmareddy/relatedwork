@@ -14,38 +14,93 @@
 
 \maketitle
 
+
 \section{Related Work}
 
-Service Function Chain (SFC) placement in 5G and beyond is a critical research area focusing on optimizing resource allocation, latency, and energy efficiency. Various approaches have been proposed to address the challenges of deploying Virtual Network Functions (VNFs) across heterogeneous and multi-generational networks (2G to 6G).
+Service Function Chain (SFC) placement in multi-generation networks (2G–6G) is a critical challenge that requires optimizing latency, resource allocation, and energy efficiency. Existing approaches primarily focus on static optimization methods, mobility handling, and specific traffic types but do not fully address the dynamic, multi-dimensional nature of modern networks. Our proposed **Extensible Constraint-Aware Pipeline (ECAP)** addresses these gaps through a flexible and adaptive architecture capable of optimizing SFC placement in real-time across multi-generation networks.
 
-\subsection{SFC Placement Optimization}
+\subsection{Latency and Resource Optimization in SFC Placement}
 
-Traditional SFC placement strategies leverage optimization techniques such as Integer Linear Programming (ILP) and Mixed-Integer Linear Programming (MILP) to minimize latency and maximize resource utilization \cite{ilp_sfc, milp_sfc}. While these models ensure optimal placement, their computational complexity makes them impractical for large-scale dynamic networks. Heuristic-based approaches, including greedy algorithms and Genetic Algorithms (GA), offer faster computation but often at the expense of optimality \cite{heuristic_sfc}.
+Initial approaches to SFC placement focused on minimizing **end-to-end (E2E) latency** using Integer Linear Programming (ILP) models \cite{paper1}. These models identify optimal Virtual Network Function (VNF) placement to reduce latency. However, **ILP-based** methods face scalability issues, making them impractical for real-world dynamic environments. 
 
-The Extensible Constraint-Aware Pipeline (ECAP) addresses these limitations by providing a flexible framework capable of adapting to evolving network requirements. It integrates novel cost functions that account for microservice types, multi-generational traffic profiles, and external factors such as user location, enabling more dynamic and scalable SFC placement.
+Our work extends beyond static latency optimization by using **Constrained Shortest Path First (CSPF)** and a **Resource Collector**. **CSPF** identifies low-latency paths under multi-dimensional constraints, while the **Resource Collector** ensures these paths meet microservice resource requirements in real-time.
 
-\subsection{Constraint-Based Path Selection}
+\subsection{Mobility-Aware SFC Placement}
 
-Constraint-Based Path Selection methods, such as Constrained Shortest Path First (CSPF), have been widely adopted to meet Quality of Service (QoS) requirements \cite{cspf_qos}. CSPF identifies feasible paths based on latency, bandwidth, and reliability while optimizing resource consumption. The proposed ECAP framework extends CSPF by incorporating multi-dimensional constraints, ensuring the selected paths satisfy both SFC placement and resource availability criteria.
+A key limitation of static optimization models is their inability to handle **user mobility**. Mixed-Integer Linear Programming (MILP) addresses this by allowing fractional VNF placement to reduce migration overhead during handovers \cite{paper2}. However, MILP is computationally expensive and unsuitable for rapid changes in large-scale networks.
 
-\subsection{Resource-Aware Orchestration}
+Our **ECAP** framework addresses mobility challenges by dynamically adapting to real-time **resource fluctuations** and **user mobility** through a **plugin-based** architecture. Unlike MILP, our approach efficiently handles dynamic path selection without incurring the computational burden of continuous re-optimization.
 
-Recent works emphasize resource-aware orchestration frameworks to support heterogeneous environments \cite{resource_aware}. These frameworks collect real-time resource metrics and dynamically allocate VNFs to meet Service Level Agreement (SLA) requirements. The ECAP framework enhances this by providing a plugin-based architecture where modules like CSPF and resource collectors collaboratively identify the most optimal deployment path.
+\subsection{End-to-End Network Slicing and Multi-Generation Support}
+
+Network slicing facilitates service differentiation in 5G and beyond. Existing work optimizes slice-specific SFC placement across Enhanced Mobile Broadband (eMBB), Ultra-Reliable Low Latency Communications (URLLC), and Massive Machine-Type Communications (mMTC) \cite{paper3}. However, current approaches lack the ability to account for **multi-generation traffic (2G–6G)** and external factors like **geographical location**.
+
+Our **ECAP** framework introduces a **novel cost function** that considers:
+\begin{itemize}
+    \item **Microservice Type** – Accounting for the unique deployment needs of different microservices.
+    \item **Traffic Characteristics** – Supporting **2G to 6G** traffic, including QFI/QCI/SLA-based prioritization.
+    \item **External Factors** – Incorporating geographic **location** and **energy constraints** for more accurate deployment decisions.
+\end{itemize}
+
+This enables **ECAP** to deliver optimized SFC placement under **diverse network conditions**, offering superior adaptability across different generations.
+
+\subsection{Distributed SFC and Scalability Challenges}
+
+Centralized approaches lead to bottlenecks and cannot scale efficiently with increasing network size. **Distributed Service Function Chaining (DSFC)** improves scalability by distributing VNFs across multiple machines \cite{paper4}. However, **DSFC** does not provide an integrated solution to balance **latency** and **resource availability** concurrently.
+
+Our **ECAP** framework overcomes these limitations by using a **dual-optimization strategy**:
+\begin{itemize}
+    \item **CSPF Module** – Identifies paths that satisfy latency and policy constraints.
+    \item **Resource Collector** – Ensures these paths have adequate resources for microservice deployment.
+\end{itemize}
+
+By combining these two modules, our solution dynamically adjusts to changes in **network state** and **traffic load**, ensuring both scalability and optimal performance.
+
+\subsection{AI-Based and Adaptive Approaches}
+
+Recent work applies **Graph Convolutional Neural Networks (GCNs)** with **Maximal Weight Matching (MWM)** to improve SFC placement by learning dynamic network structures \cite{paper5}. While these approaches offer better adaptability, they require substantial computational resources and offline training, limiting their applicability to real-time systems.
+
+In contrast, our **ECAP** framework is **plug-in based** and can incorporate **both heuristic and AI models** without requiring retraining. This flexibility allows our system to adapt to **real-time changes** without incurring the overhead of neural network training.
+
+\subsection{Our Novelty and Contributions}
+
+Our proposed **ECAP** framework introduces several novel features that address the limitations of previous approaches:
+
+\begin{itemize}
+    \item \textbf{Extensible Architecture:} Unlike prior work, our pipeline-based framework supports **plug-ins** for both path selection (**CSPF**) and resource monitoring (**Resource Collector**), ensuring modular and future-proof SFC optimization.
+    
+    \item \textbf{Multi-Dimensional Cost Function:} We present a new cost model incorporating:
+    \begin{itemize}
+        \item Microservice type-specific constraints.
+        \item Multi-generation traffic types (**2G-6G**) and SLA/QFI/QCI factors.
+        \item External considerations like **geographic location** and **energy consumption**.
+    \end{itemize}
+
+    \item \textbf{Dual-Path Optimization:**} We combine **CSPF** for low-latency path selection with a **Resource Collector** to verify resource availability. This dual-check process ensures that only feasible, low-latency paths are chosen for deployment.
+
+    \item \textbf{Scalable and Real-Time Adaptation:**} Our method is designed to **dynamically adapt** to network fluctuations without the computational complexity of MILP-based solutions, enabling real-time decision-making.
+
+\end{itemize}
+
+These enhancements allow **ECAP** to outperform existing solutions by providing a **scalable**, **flexible**, and **efficient** approach to **SFC placement** across **multi-generation networks**.
 
 \section{References}
 
 \begin{thebibliography}{99}
 
-\bibitem{ilp_sfc} H. Moens and F. De Turck, ``VNF-P: A Model for Efficient Placement of Virtualized Network Functions,'' \emph{IEEE Transactions on Network and Service Management}, vol. 13, no. 3, pp. 406-419, 2016.
+\bibitem{paper1} ``Latency-Aware Service Function Chain Placement in 5G Mobile Networks (With Heuristic Approach),'' 2021.
 
-\bibitem{milp_sfc} X. Li, J. Wang, and Y. Zhao, ``Latency and Mobility-Aware Service Function Chain Placement in 5G Networks,'' in \emph{Proc. IEEE ICC}, 2021, pp. 1-6.
+\bibitem{paper2} ``Latency and Mobility-Aware Service Function Chain Placement in 5G Networks,'' 2021.
 
-\bibitem{heuristic_sfc} Z. Cao, H. Yu, and X. Liu, ``A Heuristic Approach for Fast and Reliable SFC Deployment in 5G Networks,'' \emph{IEEE Communications Letters}, vol. 24, no. 9, pp. 2043-2047, 2020.
+\bibitem{paper3} ``Orchestrating End-to-End Slices in 5G Networks,'' 2019.
 
-\bibitem{cspf_qos} R. Bhamare et al., ``Optimal Virtual Network Function Placement using CSPF for QoS in 5G Networks,'' \emph{IEEE Transactions on Network and Service Management}, vol. 17, no. 2, pp. 782-795, 2020.
+\bibitem{paper4} ``Distributed Service Function Chaining (DSFC) – In-Depth Explanation,'' 2017.
 
-\bibitem{resource_aware} M. Peuster, H. Karl, and S. van Rossem, ``MeDICINE: Dynamic and Resource-Aware Service Function Chain Deployment,'' in \emph{Proc. IEEE CNSM}, 2016, pp. 34-40.
+\bibitem{paper5} ``Virtual Network Function Placement Using Differentiated Weight Graph Convolutional Neural Network and Maximal Weight Matching,'' 2021.
 
 \end{thebibliography}
 
 \end{document}
+
+
+
