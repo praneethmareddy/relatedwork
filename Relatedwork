@@ -1,3 +1,19 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{cite}
+
+\begin{document}
+
+\title{Extensible Constraint-Aware Pipeline for Optimized SFC Placement in Multi-Generation Networks}
+
+\author{
+    \IEEEauthorblockN{Your Name}
+    \IEEEauthorblockA{Department of XYZ \\
+    University/Organization \\
+    Email: your.email@example.com}
+}
+
+\maketitle
+
 \section{Related Work}
 
 Service Function Chain (SFC) placement in 5G and beyond is a critical research area focusing on optimizing resource allocation, latency, and energy efficiency. Various approaches have been proposed to address the challenges of deploying Virtual Network Functions (VNFs) across heterogeneous and multi-generational networks (2G to 6G).
@@ -31,3 +47,5 @@ Recent works emphasize resource-aware orchestration frameworks to support hetero
 \bibitem{resource_aware} M. Peuster, H. Karl, and S. van Rossem, ``MeDICINE: Dynamic and Resource-Aware Service Function Chain Deployment,'' in \emph{Proc. IEEE CNSM}, 2016, pp. 34-40.
 
 \end{thebibliography}
+
+\end{document}
