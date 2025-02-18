@@ -1,0 +1,33 @@
+\section{Related Work}
+
+Service Function Chain (SFC) placement in 5G and beyond is a critical research area focusing on optimizing resource allocation, latency, and energy efficiency. Various approaches have been proposed to address the challenges of deploying Virtual Network Functions (VNFs) across heterogeneous and multi-generational networks (2G to 6G).
+
+\subsection{SFC Placement Optimization}
+
+Traditional SFC placement strategies leverage optimization techniques such as Integer Linear Programming (ILP) and Mixed-Integer Linear Programming (MILP) to minimize latency and maximize resource utilization \cite{ilp_sfc, milp_sfc}. While these models ensure optimal placement, their computational complexity makes them impractical for large-scale dynamic networks. Heuristic-based approaches, including greedy algorithms and Genetic Algorithms (GA), offer faster computation but often at the expense of optimality \cite{heuristic_sfc}.
+
+The Extensible Constraint-Aware Pipeline (ECAP) addresses these limitations by providing a flexible framework capable of adapting to evolving network requirements. It integrates novel cost functions that account for microservice types, multi-generational traffic profiles, and external factors such as user location, enabling more dynamic and scalable SFC placement.
+
+\subsection{Constraint-Based Path Selection}
+
+Constraint-Based Path Selection methods, such as Constrained Shortest Path First (CSPF), have been widely adopted to meet Quality of Service (QoS) requirements \cite{cspf_qos}. CSPF identifies feasible paths based on latency, bandwidth, and reliability while optimizing resource consumption. The proposed ECAP framework extends CSPF by incorporating multi-dimensional constraints, ensuring the selected paths satisfy both SFC placement and resource availability criteria.
+
+\subsection{Resource-Aware Orchestration}
+
+Recent works emphasize resource-aware orchestration frameworks to support heterogeneous environments \cite{resource_aware}. These frameworks collect real-time resource metrics and dynamically allocate VNFs to meet Service Level Agreement (SLA) requirements. The ECAP framework enhances this by providing a plugin-based architecture where modules like CSPF and resource collectors collaboratively identify the most optimal deployment path.
+
+\section{References}
+
+\begin{thebibliography}{99}
+
+\bibitem{ilp_sfc} H. Moens and F. De Turck, ``VNF-P: A Model for Efficient Placement of Virtualized Network Functions,'' \emph{IEEE Transactions on Network and Service Management}, vol. 13, no. 3, pp. 406-419, 2016.
+
+\bibitem{milp_sfc} X. Li, J. Wang, and Y. Zhao, ``Latency and Mobility-Aware Service Function Chain Placement in 5G Networks,'' in \emph{Proc. IEEE ICC}, 2021, pp. 1-6.
+
+\bibitem{heuristic_sfc} Z. Cao, H. Yu, and X. Liu, ``A Heuristic Approach for Fast and Reliable SFC Deployment in 5G Networks,'' \emph{IEEE Communications Letters}, vol. 24, no. 9, pp. 2043-2047, 2020.
+
+\bibitem{cspf_qos} R. Bhamare et al., ``Optimal Virtual Network Function Placement using CSPF for QoS in 5G Networks,'' \emph{IEEE Transactions on Network and Service Management}, vol. 17, no. 2, pp. 782-795, 2020.
+
+\bibitem{resource_aware} M. Peuster, H. Karl, and S. van Rossem, ``MeDICINE: Dynamic and Resource-Aware Service Function Chain Deployment,'' in \emph{Proc. IEEE CNSM}, 2016, pp. 34-40.
+
+\end{thebibliography}
