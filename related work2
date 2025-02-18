@@ -1,0 +1,92 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{cite}
+
+\begin{document}
+
+\title{LLM-Assisted Constraint-Aware Pipeline for Optimized SFC Placement in Data Center Networks}
+
+\author{
+    \IEEEauthorblockN{Your Name}
+    \IEEEauthorblockA{Department of XYZ \\
+    University/Organization \\
+    Email: your.email@example.com}
+}
+
+\maketitle
+
+\section{Related Work}
+
+Service Function Chain (SFC) placement is a critical challenge in modern multi-generation networks (2G–6G), especially within Data Center Networks (DCNs). Efficient SFC deployment must optimize latency, resource allocation, and reliability while adapting to dynamic traffic patterns. Existing work has explored various strategies to address these challenges, but significant gaps remain in providing a **holistic, adaptive, and automated** solution that meets multi-generational requirements.
+
+\subsection{Latency and Resource-Aware SFC Placement}
+
+Early research on SFC placement focused on **latency minimization** through **Integer Linear Programming (ILP)** \cite{paper1}. While ILP guarantees optimal placement, its computational complexity makes it impractical for large-scale and dynamic environments. **Heuristic approaches** were later introduced to approximate optimal solutions with reduced computational overhead. However, these models fail to adapt to real-time network conditions and multi-generational traffic demands.
+
+Our approach extends beyond these methods by incorporating **Constrained Shortest Path First (CSPF)** for real-time latency-aware path selection while simultaneously using a **resource collector** to ensure sufficient resource availability for microservice deployment.
+
+\subsection{Mobility-Aware and Dynamic Optimization}
+
+To address user mobility, **Mixed-Integer Linear Programming (MILP)** methods were developed to enable **fractional VNF placement** and minimize service disruptions during handovers \cite{paper2}. While these models account for mobility, they are computationally intensive and static, making them unsuitable for rapidly changing DCNs.
+
+Our solution integrates **SARIMA (Seasonal AutoRegressive Integrated Moving Average)** to **forecast traffic patterns**, dynamically adjusting resource allocation and microservice configurations. This predictive capability enables more responsive and efficient VNF placement.
+
+\subsection{End-to-End Network Slicing for Multi-Generation Traffic}
+
+Network slicing strategies introduced by \cite{paper3} optimize SFC placement for **Enhanced Mobile Broadband (eMBB)**, **Ultra-Reliable Low Latency Communications (URLLC)**, and **Massive Machine-Type Communications (mMTC)**. These approaches, while effective for 5G, do not generalize to **multi-generation (2G–6G)** networks or adapt to diverse traffic types.
+
+Our **Constraint-Aware Pipeline (CAP)** addresses this limitation by supporting **multi-dimensional cost functions** that account for:
+\begin{itemize}
+    \item Microservice type
+    \item Multi-generation traffic profiles (2G–6G)
+    \item QoS parameters (QFI/QCI/SLA)
+    \item External factors (e.g., node location, energy efficiency)
+\end{itemize}
+
+\subsection{Distributed SFC and Scalability Challenges}
+
+Distributed SFC models \cite{paper4} improve scalability by distributing VNFs across multiple physical nodes. However, these approaches focus only on static resource allocation and overlook real-time adaptation to **traffic variations**.
+
+In contrast, our method leverages **LLM-assisted configuration generation**, which dynamically adjusts microservice deployment based on **node type** and **service requirements**. This adaptive mechanism allows for fine-grained control over SFC placement across large-scale DCNs.
+
+\subsection{AI-Based Approaches for Dynamic Environments}
+
+Recent advancements employ **Graph Convolutional Neural Networks (GCNs)** for dynamic VNF placement \cite{paper5}. While these AI-driven approaches adapt to changing network conditions, they lack a comprehensive cost model and **automated microservice configuration**.
+
+Our proposed **LLM-assisted CAP** complements AI-based techniques by:
+\begin{itemize}
+    \item **Automating microservice configuration** based on traffic forecasts and system requirements.
+    \item **Integrating CSPF and resource collectors** for simultaneous path and resource optimization.
+    \item **Forecasting traffic behavior** via **SARIMA**, enabling **proactive adaptation**.
+\end{itemize}
+
+\subsection{Our Novelty and Contributions}
+
+Our **LLM-assisted Constraint-Aware Pipeline (CAP)** introduces the following novel features not addressed by prior work:
+
+\begin{itemize}
+    \item **Holistic SFC Optimization**: Simultaneous consideration of **latency**, **resource availability**, and **multi-generation traffic** in a unified pipeline.
+    \item **Dynamic Adaptation**: Use of **SARIMA** for forecasting traffic patterns and adjusting microservice configurations in real time.
+    \item **Automated Deployment**: Leverages **Large Language Models (LLMs)** to generate node-specific configurations, reducing human intervention and errors.
+    \item **Modular Extensibility**: Supports plug-ins like **CSPF** for path selection and a **resource collector** for real-time monitoring.
+    \item **Multi-Dimensional Cost Function**: Accounts for diverse factors, including **microservice type**, **SLA requirements**, and **location-based constraints**.
+\end{itemize}
+
+Our method not only improves the efficiency of SFC deployment but also adapts to **dynamic and diverse traffic** across **2G-6G** networks, addressing scalability, adaptability, and automation gaps present in prior work.
+
+\section{References}
+
+\begin{thebibliography}{99}
+
+\bibitem{paper1} ``Latency-Aware Service Function Chain Placement in 5G Mobile Networks (With Heuristic Approach),'' 2021.
+
+\bibitem{paper2} ``Latency and Mobility-Aware Service Function Chain Placement in 5G Networks,'' 2021.
+
+\bibitem{paper3} ``Orchestrating End-to-End Slices in 5G Networks,'' 2019.
+
+\bibitem{paper4} ``Distributed Service Function Chaining (DSFC) – In-Depth Explanation,'' 2017.
+
+\bibitem{paper5} ``Virtual Network Function Placement Using Differentiated Weight Graph Convolutional Neural Network and Maximal Weight Matching,'' 2021.
+
+\end{thebibliography}
+
+\end{document}
