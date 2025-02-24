@@ -1,0 +1,36 @@
+\section{Related Work}
+
+Service Function Chain (SFC) placement in Data Center Networks (DCNs) is a critical challenge for optimizing **latency, resource allocation, and reliability**. Existing solutions include **heuristic**, **optimization-based**, and **AI-driven** methods, but they lack **adaptive, scalable, and automated** frameworks for multi-generation (2G–6G) networks.
+
+Early research applied **Integer Linear Programming (ILP)** for latency-aware placement \cite{paper1}, but its computational complexity led to heuristic alternatives. These approaches reduced overhead but failed to adapt to real-time network variations. **Mobility-aware MILP models** \cite{paper2} improved handover efficiency but remained computationally expensive. **Network slicing strategies** \cite{paper3} enhanced 5G traffic management but lacked generalization for **2G–6G** scenarios.
+
+Recent studies emphasize scalability and reliability in SFC placement. **Santos et al.** \cite{paper6} reviewed distributed SFC scenarios, stressing the need for dynamic solutions. **Li et al.** \cite{paper7} introduced a high-availability and resource-efficient placement framework, demonstrating improvements in **resilience and resource utilization**. AI-driven **Graph Convolutional Networks (GCNs)** \cite{paper5} offer dynamic adaptation but lack **fine-grained microservice configuration**. Meanwhile, **Distributed SFC models** \cite{paper4} improve scalability but overlook **real-time traffic variations**.
+
+Our proposed **LLM-assisted Constraint-Aware Pipeline (CAP)** introduces:
+\begin{itemize}
+    \item **Adaptive microservice placement** using **SARIMA** for predictive traffic-aware optimization.
+    \item **Automated configuration generation** via LLMs, reducing manual intervention and errors.
+    \item **Multi-dimensional cost optimization**, incorporating **latency, QoS, and energy efficiency**.
+    \item **Modular framework** integrating **CSPF for path selection** and a **resource collector** for real-time monitoring.
+\end{itemize}
+Our approach aligns with IEEE GLOBECOM 2025’s theme of **"Sustainable Communications for Ubiquitous Intelligence"**, leveraging AI-driven **automation and predictive analytics** for scalable **SFC placement** across 2G–6G networks.
+
+\section{References}
+
+\begin{thebibliography}{99}
+
+\bibitem{paper1} ``Latency-Aware Service Function Chain Placement in 5G Mobile Networks (With Heuristic Approach),'' 2021.
+
+\bibitem{paper2} ``Latency and Mobility-Aware Service Function Chain Placement in 5G Networks,'' 2021.
+
+\bibitem{paper3} ``Orchestrating End-to-End Slices in 5G Networks,'' 2019.
+
+\bibitem{paper4} ``Distributed Service Function Chaining (DSFC) – In-Depth Explanation,'' 2017.
+
+\bibitem{paper5} ``Virtual Network Function Placement Using Differentiated Weight Graph Convolutional Neural Network and Maximal Weight Matching,'' 2021.
+
+\bibitem{paper6} G. L. Santos et al., ``Service Function Chain Placement in Distributed Scenarios: A Systematic Review,'' \textit{Journal of Network and Systems Management}, vol. 30, article 4, 2022.
+
+\bibitem{paper7} Y. Li et al., ``HARS: A High-Available and Resource-Saving Service Function Chain Placement Approach in Data Center Networks,'' \textit{IEEE Transactions on Network and Service Management}, vol. 19, no. 1, pp. 1-14, 2022.
+
+\end{thebibliography}
