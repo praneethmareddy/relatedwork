@@ -1,0 +1,21 @@
+\section{Related Work}
+
+Service Function Chain (SFC) placement has been extensively studied, focusing on minimizing end-to-end (E2E) latency, optimizing resource allocation, and ensuring efficient microservice deployment. Early research introduced Integer Linear Programming (ILP) models to determine the optimal placement of Virtual Network Functions (VNFs) to reduce latency and processing overhead [1]. However, ILP-based solutions suffer from high computational complexity, making them impractical for large-scale dynamic networks. To overcome this, heuristic-based approaches were proposed to approximate optimal solutions with reduced execution time, but they lack adaptability to real-time traffic fluctuations and diverse multi-generation (2G-6G) network conditions. Subsequent efforts extended this research by introducing Mixed-Integer Linear Programming (MILP) models that enable fractional VNF placement, ensuring minimal service disruptions in mobility-driven environments [2]. However, these solutions remain computationally expensive and fail to dynamically adjust resource allocation based on forecasted traffic variations. Network slicing methodologies further refined SFC placement strategies by introducing slice-specific optimizations for enhanced mobile broadband (eMBB), ultra-reliable low-latency communications (URLLC), and massive machine-type communications (mMTC) [3]. While these techniques improved resource isolation and QoS compliance, they primarily targeted 5G networks, offering limited adaptability to heterogeneous multi-generation network traffic.
+
+To enhance scalability, distributed SFC placement models have been proposed, leveraging decentralized architectures to balance load distribution and prevent bottlenecks in centralized systems [4]. Although these models improve flexibility, they do not incorporate predictive analytics for proactive resource allocation or automated deployment mechanisms for microservices. Recent advancements in AI-driven SFC optimization have introduced Graph Convolutional Neural Networks (GCNs) and Maximal Weight Matching (MWM) techniques to dynamically adjust VNF placements based on evolving network conditions [5]. However, such models rely on pre-trained datasets and lack real-time adaptability for heterogeneous traffic environments. Our proposed LLM-assisted Constraint-Aware Pipeline (CAP) addresses these gaps by integrating a constraint-aware path selection mechanism with a resource-aware microservice allocator, enabling real-time, adaptive, and automated SFC deployment. Furthermore, we incorporate SARIMA-based traffic forecasting to predict workload variations, allowing preemptive resource adjustments and minimizing service disruptions. By leveraging large language models (LLMs) for automated configuration generation, our approach reduces deployment overhead while ensuring efficient microservice placement across multi-generation networks. This comprehensive framework provides a scalable, intelligent, and future-proof solution for optimizing SFC placement in dynamic network environments.
+
+\section{References}
+
+\begin{thebibliography}{99}
+
+\bibitem{paper1} D. Harutyunyan, N. Shahriar, R. Boutaba, and R. Riggio, ``Latency-Aware Service Function Chain Placement in 5G Mobile Networks,'' in \emph{Proc. IEEE NetSoft}, 2019.
+
+\bibitem{paper2} X. Li, J. Wang, and Y. Zhao, ``Latency and Mobility-Aware Service Function Chain Placement in 5G Networks,'' in \emph{Proc. IEEE ICC}, 2021.
+
+\bibitem{paper3} B. Martini, F. Paganelli, P. Cappanera, S. Turchi, and P. Castoldi, ``Orchestrating End-to-End Slices in 5G Networks,'' in \emph{Proc. IEEE NetSoft}, 2019.
+
+\bibitem{paper4} R. Bhamare et al., ``Distributed Service Function Chaining (DSFC) – In-Depth Explanation,'' in \emph{Proc. IEEE CNSM}, 2017.
+
+\bibitem{paper5} Z. Cao, H. Yu, and X. Liu, ``Virtual Network Function Placement Using Differentiated Weight Graph Convolutional Neural Network and Maximal Weight Matching,'' \emph{IEEE Communications Letters}, vol. 24, no. 9, pp. 2043-2047, 2021.
+
+\end{thebibliography}
