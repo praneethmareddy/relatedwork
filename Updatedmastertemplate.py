@@ -5,7 +5,6 @@ import collections
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import numpy as np
 
 def extract_zip(zip_path, extract_to):
     """Extract ZIP file to a directory."""
@@ -39,7 +38,6 @@ def parse_csv(file_path):
                 else:
                     current_section = row[0]
 
-                sections[current_section]  # Ensure section is initialized
                 parameter_mode = True  # Next line should contain parameters
             elif parameter_mode:  # Parameter Line
                 sections[current_section]["parameters"].update(row)
@@ -59,7 +57,7 @@ def process_operator(operator_dir):
     section_counts = collections.defaultdict(int)
     templates = collections.defaultdict(lambda: collections.defaultdict(set))
     csv_param_sets = {}
-    
+
     for root, _, files in os.walk(operator_dir):
         for file in files:
             file_path = os.path.join(root, file)
@@ -77,9 +75,8 @@ def process_operator(operator_dir):
 
                     csv_params = set()
                     for sec, data in sections.items():
-                        if "parameters" in data:
-                            templates[sec]["parameters"].update(data["parameters"])
-                            csv_params.update(data["parameters"])
+                        templates[sec]["parameters"].update(data["parameters"])
+                        csv_params.update(data["parameters"])
 
                     csv_param_sets[file] = csv_params  # Store params per CSV
 
@@ -87,7 +84,7 @@ def process_operator(operator_dir):
 
 def merge_templates(templates):
     """Merge all section structures into a master template."""
-    return {section: sorted(data["parameters"]) for section, data in templates.items() if "parameters" in data}
+    return {section: sorted(data["parameters"]) for section, data in templates.items()}
 
 def save_master_template(operator, template, output_dir):
     """Save master template as a TXT file."""
@@ -121,49 +118,15 @@ def process_all_operators(base_directory, output_dir):
 
     return operator_master_templates, operator_section_counts, operator_param_sets
 
-def analyze_common_parameters(operator_param_sets):
-    """Analyze and visualize common parameters within each operator and across operators."""
-    operator_common_params = {}
-    global_param_sets = []
+def merge_global_master(operators_templates):
+    """Combine all operator templates into a single global master template."""
+    global_template = collections.defaultdict(set)
 
-    for operator, csv_param_sets in operator_param_sets.items():
-        if csv_param_sets:
-            common_params = set.intersection(*csv_param_sets.values()) if csv_param_sets.values() else set()
-            operator_common_params[operator] = common_params
-            global_param_sets.append(set.union(*csv_param_sets.values()))
+    for templates in operators_templates.values():
+        for section, params in templates.items():
+            global_template[section].update(params)
 
-            print(f"\nOperator: {operator}")
-            for csv, params in csv_param_sets.items():
-                print(f"{csv}: {len(params)} parameters")
-            print(f"Common Parameters in all CSVs: {len(common_params)}\n")
-
-            # Heatmap with CSV labels (Normalized)
-            plt.figure(figsize=(8, 6))
-            csv_files = list(csv_param_sets.keys())
-            param_matrix = np.array([[len(csv_param_sets[f1] & csv_param_sets[f2]) / max(len(csv_param_sets[f1] | csv_param_sets[f2]), 1)
-                                      for f2 in csv_files] for f1 in csv_files])
-            sns.heatmap(param_matrix, annot=True, cmap="Blues", xticklabels=csv_files, yticklabels=csv_files, vmin=0, vmax=1)
-            plt.title(f"Parameter Similarity Heatmap - {operator}")
-            plt.xlabel("CSV Files")
-            plt.ylabel("CSV Files")
-            plt.show()
-
-    global_common_params = set.intersection(*global_param_sets) if global_param_sets else set()
-    print("\n### Global Common Parameters Across All Operators ###")
-    for operator, params in operator_common_params.items():
-        print(f"{operator}: {len(params)} parameters")
-    print(f"Common Parameters Across Operators: {len(global_common_params)}")
-
-    # Heatmap for parameter overlap across operators (Normalized)
-    plt.figure(figsize=(8, 6))
-    operator_list = list(operator_common_params.keys())
-    param_matrix = np.array([[len(operator_common_params[o1] & operator_common_params[o2]) / max(len(operator_common_params[o1] | operator_common_params[o2]), 1)
-                              for o2 in operator_list] for o1 in operator_list])
-    sns.heatmap(param_matrix, annot=True, cmap="Greens", xticklabels=operator_list, yticklabels=operator_list, vmin=0, vmax=1)
-    plt.title("Operator-Wise Parameter Overlap Heatmap")
-    plt.xlabel("Operators")
-    plt.ylabel("Operators")
-    plt.show()
+    return {sec: sorted(params) for sec, params in global_template.items()}
 
 def save_global_master_template(global_template, output_dir):
     """Save the global master template as a TXT file."""
@@ -176,6 +139,66 @@ def save_global_master_template(global_template, output_dir):
 
     print(f"Global master template saved: {file_path}")
 
+def analyze_common_parameters(operator_param_sets):
+    """Analyze and visualize common parameters within each operator and across operators."""
+    operator_common_params = {}
+    global_param_sets = []
+
+    for operator, csv_param_sets in operator_param_sets.items():
+        if csv_param_sets:
+            common_params = set.intersection(*csv_param_sets.values())
+            operator_common_params[operator] = common_params
+            global_param_sets.append(set.union(*csv_param_sets.values()))
+
+            print(f"\nOperator: {operator}")
+            print("Total Parameters per CSV:")
+            for csv_file, param_set in csv_param_sets.items():
+                print(f"{csv_file}: {len(param_set)}")
+
+            print(f"Common Parameters in all CSVs: {len(common_params)}\n")
+
+            # Heatmap with CSV labels
+            plt.figure(figsize=(8, 6))
+            csv_files = list(csv_param_sets.keys())
+            param_matrix = [[len(csv_param_sets[f1] & csv_param_sets[f2]) for f2 in csv_files] for f1 in csv_files]
+            sns.heatmap(param_matrix, annot=True, cmap="Blues", xticklabels=csv_files, yticklabels=csv_files)
+            plt.title(f"Parameter Similarity Heatmap - {operator}")
+            plt.xlabel("CSV Files")
+            plt.ylabel("CSV Files")
+            plt.show()
+
+    global_common_params = set.intersection(*global_param_sets) if global_param_sets else set()
+    print("\n### Global Common Parameters Across All Operators ###")
+    print("Total Unique Parameters Per Operator:")
+    for operator, param_set in operator_common_params.items():
+        print(f"{operator}: {len(param_set)}")
+
+    print(f"Common Parameters Across Operators: {len(global_common_params)}")
+
+    # Heatmap for parameter overlap across operators
+    plt.figure(figsize=(8, 6))
+    operator_list = list(operator_common_params.keys())
+    param_matrix = [[len(operator_common_params[o1] & operator_common_params[o2]) for o2 in operator_list] for o1 in operator_list]
+    sns.heatmap(param_matrix, annot=True, cmap="Greens", xticklabels=operator_list, yticklabels=operator_list)
+    plt.title("Operator-Wise Parameter Overlap Heatmap")
+    plt.xlabel("Operators")
+    plt.ylabel("Operators")
+    plt.show()
+
+def analyze_section_distribution(operator_section_counts):
+    """Display section type distribution across operators."""
+    section_df = pd.DataFrame(operator_section_counts).fillna(0).astype(int)
+    print("\n### Section Type Distribution Across Operators ###")
+    print(section_df)
+
+    # Bar plot visualization
+    section_df.T.plot(kind='bar', stacked=True, figsize=(10, 6), colormap="viridis")
+    plt.title("Section Type Distribution Across Operators")
+    plt.xlabel("Operators")
+    plt.ylabel("Section Count")
+    plt.legend(title="Section Type", bbox_to_anchor=(1, 1))
+    plt.show()
+
 def main():
     base_directory = "path/to/your/directory"  # Change this
     output_dir = "path/to/output/directory"  # Change this
@@ -183,8 +206,9 @@ def main():
     operator_templates, operator_counts, operator_param_sets = process_all_operators(base_directory, output_dir)
 
     analyze_common_parameters(operator_param_sets)
+    analyze_section_distribution(operator_counts)
 
-    global_master_template = merge_templates(operator_templates)
+    global_master_template = merge_global_master(operator_templates)
     save_global_master_template(global_master_template, output_dir)
 
 if __name__ == "__main__":
