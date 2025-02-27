@@ -39,6 +39,7 @@ def parse_csv(file_path):
                 else:
                     current_section = row[0]
 
+                sections[current_section]  # Ensure section is initialized
                 parameter_mode = True  # Next line should contain parameters
             elif parameter_mode:  # Parameter Line
                 sections[current_section]["parameters"].update(row)
@@ -76,8 +77,9 @@ def process_operator(operator_dir):
 
                     csv_params = set()
                     for sec, data in sections.items():
-                        templates[sec]["parameters"].update(data["parameters"])
-                        csv_params.update(data["parameters"])
+                        if "parameters" in data:
+                            templates[sec]["parameters"].update(data["parameters"])
+                            csv_params.update(data["parameters"])
 
                     csv_param_sets[file] = csv_params  # Store params per CSV
 
@@ -85,7 +87,7 @@ def process_operator(operator_dir):
 
 def merge_templates(templates):
     """Merge all section structures into a master template."""
-    return {section: sorted(data["parameters"]) for section, data in templates.items()}
+    return {section: sorted(data["parameters"]) for section, data in templates.items() if "parameters" in data}
 
 def save_master_template(operator, template, output_dir):
     """Save master template as a TXT file."""
@@ -126,7 +128,7 @@ def analyze_common_parameters(operator_param_sets):
 
     for operator, csv_param_sets in operator_param_sets.items():
         if csv_param_sets:
-            common_params = set.intersection(*csv_param_sets.values())
+            common_params = set.intersection(*csv_param_sets.values()) if csv_param_sets.values() else set()
             operator_common_params[operator] = common_params
             global_param_sets.append(set.union(*csv_param_sets.values()))
 
