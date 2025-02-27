@@ -12,31 +12,43 @@ def extract_zip(zip_path, extract_to):
         zip_ref.extractall(extract_to)
 
 def clean_text(text):
-    """Remove unwanted delimiters and whitespace."""
+    """Remove unwanted characters and normalize text."""
     return text.strip().replace('"', '').replace("'", "").replace("\t", " ")
 
 def parse_csv(file_path):
-    """Parse CSV while handling multi-line sections and removing delimiters."""
+    """Parse CSV handling multi-line sections, correct parameter-value separation."""
     sections = collections.defaultdict(lambda: {"parameters": set(), "values": []})
     current_section = None
+    parameter_mode = False  # Track if we are in parameter mode
 
     with open(file_path, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
+        buffer = []  # Buffer for multi-line section names
+
         for row in reader:
             if not row:
                 continue  # Skip empty rows
-            
-            row = [clean_text(cell) for cell in row]
-            first_cell = row[0]
 
-            if first_cell.startswith("@"):  # Section name
-                current_section = first_cell
-                param_row = next(reader, [])
-                param_row = [clean_text(param) for param in param_row]
-                sections[current_section]["parameters"].update(param_row)
-            else:
-                if current_section:
-                    sections[current_section]["parameters"].update(row)
+            row = [clean_text(cell) for cell in row]
+
+            if row[0].startswith("@"):  # Section Name
+                if buffer:
+                    current_section = clean_text("".join(buffer))  # Join multi-line section name
+                    buffer = []
+                else:
+                    current_section = row[0]
+
+                parameter_mode = True  # Next line should contain parameters
+            elif parameter_mode:  # Parameter Line
+                sections[current_section]["parameters"].update(row)
+                parameter_mode = False  # Switch to value mode
+            else:  # Values, ensure they are stored separately
+                sections[current_section]["values"].append(row)
+
+        # Handle last buffered section name
+        if buffer:
+            current_section = clean_text("".join(buffer))
+            sections[current_section]["parameters"].update(row)
 
     return sections
 
@@ -44,8 +56,8 @@ def process_operator(operator_dir):
     """Process all CSVs for a given operator."""
     section_counts = collections.defaultdict(int)
     templates = collections.defaultdict(lambda: collections.defaultdict(set))
-    csv_param_sets = []
-
+    csv_param_sets = {}
+    
     for root, _, files in os.walk(operator_dir):
         for file in files:
             file_path = os.path.join(root, file)
@@ -60,20 +72,19 @@ def process_operator(operator_dir):
                 if sections:
                     first_section = next(iter(sections))
                     section_counts[first_section] += 1
-                    
+
                     csv_params = set()
                     for sec, data in sections.items():
                         templates[sec]["parameters"].update(data["parameters"])
                         csv_params.update(data["parameters"])
-                    
-                    csv_param_sets.append(csv_params)  # Store params from each CSV
+
+                    csv_param_sets[file] = csv_params  # Store params per CSV
 
     return section_counts, templates, csv_param_sets
 
 def merge_templates(templates):
     """Merge all section structures into a master template."""
-    master_template = {section: sorted(data["parameters"]) for section, data in templates.items()}
-    return master_template
+    return {section: sorted(data["parameters"]) for section, data in templates.items()}
 
 def save_master_template(operator, template, output_dir):
     """Save master template as a TXT file."""
@@ -101,9 +112,8 @@ def process_all_operators(base_directory, output_dir):
             section_counts, templates, csv_param_sets = process_operator(operator_path)
             operator_master_templates[operator] = merge_templates(templates)
             operator_section_counts[operator] = section_counts
-            operator_param_sets[operator] = csv_param_sets  # Store parameter sets per CSV
+            operator_param_sets[operator] = csv_param_sets
 
-            # Save operator-specific master template
             save_master_template(operator, operator_master_templates[operator], output_dir)
 
     return operator_master_templates, operator_section_counts, operator_param_sets
@@ -136,24 +146,24 @@ def analyze_common_parameters(operator_param_sets):
 
     for operator, csv_param_sets in operator_param_sets.items():
         if csv_param_sets:
-            common_params = set.intersection(*csv_param_sets)
+            common_params = set.intersection(*csv_param_sets.values())
             operator_common_params[operator] = common_params
-            global_param_sets.append(set.union(*csv_param_sets))
+            global_param_sets.append(set.union(*csv_param_sets.values()))
 
             print(f"\nOperator: {operator}")
-            print(f"Total Parameters in CSVs: {[len(p) for p in csv_param_sets]}")
+            print(f"Total Parameters per CSV: {[len(p) for p in csv_param_sets.values()]}")
             print(f"Common Parameters in all CSVs: {len(common_params)}\n")
 
-            # Heatmap for parameter similarity
+            # Heatmap with CSV labels
             plt.figure(figsize=(8, 6))
-            param_matrix = [[len(set1 & set2) for set2 in csv_param_sets] for set1 in csv_param_sets]
-            sns.heatmap(param_matrix, annot=True, cmap="Blues", xticklabels=False, yticklabels=False)
+            csv_files = list(csv_param_sets.keys())
+            param_matrix = [[len(csv_param_sets[f1] & csv_param_sets[f2]) for f2 in csv_files] for f1 in csv_files]
+            sns.heatmap(param_matrix, annot=True, cmap="Blues", xticklabels=csv_files, yticklabels=csv_files)
             plt.title(f"Parameter Similarity Heatmap - {operator}")
             plt.xlabel("CSV Files")
             plt.ylabel("CSV Files")
             plt.show()
 
-    # Global common parameters across all operators
     global_common_params = set.intersection(*global_param_sets) if global_param_sets else set()
     print("\n### Global Common Parameters Across All Operators ###")
     print(f"Total Unique Parameters Per Operator: {[len(p) for p in global_param_sets]}")
@@ -179,10 +189,6 @@ def main():
 
     global_master_template = merge_global_master(operator_templates)
     save_global_master_template(global_master_template, output_dir)
-
-    print("\n### Global Master Template (Across All Operators) ###")
-    for section, params in global_master_template.items():
-        print(f"  {section}: {params}")
 
 if __name__ == "__main__":
     main()
