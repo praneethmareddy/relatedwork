@@ -19,7 +19,6 @@ def parse_csv(file_path):
     """Parse CSV while handling multi-line sections and removing delimiters."""
     sections = collections.defaultdict(lambda: {"parameters": set(), "values": []})
     current_section = None
-    pending_params = None
 
     with open(file_path, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
@@ -32,9 +31,9 @@ def parse_csv(file_path):
 
             if first_cell.startswith("@"):  # Section name
                 current_section = first_cell
-                pending_params = next(reader, [])
-                pending_params = [clean_text(param) for param in pending_params]
-                sections[current_section]["parameters"].update(pending_params)
+                param_row = next(reader, [])
+                param_row = [clean_text(param) for param in param_row]
+                sections[current_section]["parameters"].update(param_row)
             else:
                 if current_section:
                     sections[current_section]["parameters"].update(row)
@@ -73,9 +72,7 @@ def process_operator(operator_dir):
 
 def merge_templates(templates):
     """Merge all section structures into a master template."""
-    master_template = {}
-    for section, data in templates.items():
-        master_template[section] = sorted(data["parameters"])
+    master_template = {section: sorted(data["parameters"]) for section, data in templates.items()}
     return master_template
 
 def save_master_template(operator, template, output_dir):
@@ -138,28 +135,31 @@ def analyze_common_parameters(operator_param_sets):
     global_param_sets = []
 
     for operator, csv_param_sets in operator_param_sets.items():
-        common_params = set.intersection(*csv_param_sets) if csv_param_sets else set()
-        operator_common_params[operator] = common_params
-        global_param_sets.append(set.union(*csv_param_sets) if csv_param_sets else set())
+        if csv_param_sets:
+            common_params = set.intersection(*csv_param_sets)
+            operator_common_params[operator] = common_params
+            global_param_sets.append(set.union(*csv_param_sets))
 
-        print(f"\nOperator: {operator}")
-        print(f"Common Parameters in all CSVs: {common_params}\n")
+            print(f"\nOperator: {operator}")
+            print(f"Total Parameters in CSVs: {[len(p) for p in csv_param_sets]}")
+            print(f"Common Parameters in all CSVs: {len(common_params)}\n")
 
-        # Heatmap of parameter overlap within operator
-        plt.figure(figsize=(8, 6))
-        param_matrix = [[len(set1 & set2) for set2 in csv_param_sets] for set1 in csv_param_sets]
-        sns.heatmap(param_matrix, annot=True, cmap="Blues", xticklabels=False, yticklabels=False)
-        plt.title(f"Parameter Similarity Heatmap - {operator}")
-        plt.xlabel("CSV Files")
-        plt.ylabel("CSV Files")
-        plt.show()
+            # Heatmap for parameter similarity
+            plt.figure(figsize=(8, 6))
+            param_matrix = [[len(set1 & set2) for set2 in csv_param_sets] for set1 in csv_param_sets]
+            sns.heatmap(param_matrix, annot=True, cmap="Blues", xticklabels=False, yticklabels=False)
+            plt.title(f"Parameter Similarity Heatmap - {operator}")
+            plt.xlabel("CSV Files")
+            plt.ylabel("CSV Files")
+            plt.show()
 
     # Global common parameters across all operators
     global_common_params = set.intersection(*global_param_sets) if global_param_sets else set()
     print("\n### Global Common Parameters Across All Operators ###")
-    print(global_common_params)
+    print(f"Total Unique Parameters Per Operator: {[len(p) for p in global_param_sets]}")
+    print(f"Common Parameters Across Operators: {len(global_common_params)}")
 
-    # Heatmap of parameter overlap across operators
+    # Heatmap for parameter overlap across operators
     plt.figure(figsize=(8, 6))
     operator_list = list(operator_common_params.keys())
     param_matrix = [[len(operator_common_params[o1] & operator_common_params[o2]) for o2 in operator_list] for o1 in operator_list]
